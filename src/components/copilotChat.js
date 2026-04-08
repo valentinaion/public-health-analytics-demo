@@ -27,17 +27,30 @@ function createMessageBubble(msg) {
   const div = document.createElement('div');
   div.className = `msg ${isAI ? 'ai' : 'user'}`;
 
+  const avatar = document.createElement('div');
+  avatar.setAttribute('aria-hidden', 'true');
+
   if (isAI) {
-    div.innerHTML = `
-      <div class="msg-avatar ai" aria-hidden="true">✨</div>
-      <div style="position:relative;flex:1">
-        <div class="msg-bubble" style="padding-right:36px">${msg.text}</div>
-        <button class="msg-copy-btn" title="Copy message" aria-label="Copy message to clipboard">📋</button>
-      </div>
-    `;
-    const copyBtn = div.querySelector('.msg-copy-btn');
+    avatar.className = 'msg-avatar ai';
+    avatar.textContent = '✨';
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative;flex:1';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.style.paddingRight = '36px';
+    // AI responses contain trusted, internally-generated HTML formatting (bold, lists)
+    // They originate only from getAIResponse() in src/api/copilot.js, not from user input
+    bubble.innerHTML = msg.text;
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'msg-copy-btn';
+    copyBtn.title = 'Copy message';
+    copyBtn.setAttribute('aria-label', 'Copy message to clipboard');
+    copyBtn.textContent = '📋';
     copyBtn.addEventListener('click', () => {
-      const text = div.querySelector('.msg-bubble').innerText;
+      const text = bubble.innerText;
       navigator.clipboard.writeText(text).then(() => {
         copyBtn.textContent = '✓';
         copyBtn.title = 'Copied!';
@@ -47,20 +60,24 @@ function createMessageBubble(msg) {
         }, 2000);
       });
     });
+
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(copyBtn);
+    div.appendChild(avatar);
+    div.appendChild(wrapper);
   } else {
-    div.innerHTML = `
-      <div class="msg-avatar human" aria-hidden="true">PH</div>
-      <div class="msg-bubble">${escapeHtml(msg.text)}</div>
-    `;
+    avatar.className = 'msg-avatar human';
+    avatar.textContent = 'PH';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = msg.text;
+
+    div.appendChild(avatar);
+    div.appendChild(bubble);
   }
 
   return div;
-}
-
-function escapeHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
 }
 
 function createTypingIndicator() {

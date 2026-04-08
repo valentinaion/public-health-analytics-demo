@@ -201,13 +201,38 @@ function showHotspotTooltip(hotspot, anchorEl) {
   tip.style.left = (rect.left - mapRect.left + 20) + 'px';
   tip.style.top = (rect.top - mapRect.top - 10) + 'px';
 
-  tip.innerHTML = `
-    <div style="font-weight:600;margin-bottom:4px">${hotspot.label}</div>
-    <div style="color:var(--text-muted);margin-bottom:6px">${hotspot.district} · Risk: ${hotspot.riskLevel}</div>
-    <div style="margin-bottom:6px">Active Cases: <strong>${hotspot.activeCases.toLocaleString()}</strong></div>
-    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">${hotspot.description}</div>
-    <button class="btn-primary" style="font-size:12px;padding:5px 12px;border-radius:5px;cursor:pointer" onclick="document.querySelector('[data-tab=surveillance]')?.click()">View full report →</button>
-  `;
+  const nameEl = document.createElement('div');
+  nameEl.style.cssText = 'font-weight:600;margin-bottom:4px';
+  nameEl.textContent = hotspot.label;
+
+  const metaEl = document.createElement('div');
+  metaEl.style.cssText = 'color:var(--text-muted);margin-bottom:6px';
+  metaEl.textContent = `${hotspot.district} · Risk: ${hotspot.riskLevel}`;
+
+  const casesEl = document.createElement('div');
+  casesEl.style.marginBottom = '6px';
+  casesEl.textContent = 'Active Cases: ';
+  const casesBold = document.createElement('strong');
+  casesBold.textContent = hotspot.activeCases.toLocaleString();
+  casesEl.appendChild(casesBold);
+
+  const descEl = document.createElement('div');
+  descEl.style.cssText = 'font-size:12px;color:var(--text-secondary);margin-bottom:10px';
+  descEl.textContent = hotspot.description;
+
+  const btn = document.createElement('button');
+  btn.className = 'btn-primary';
+  btn.style.cssText = 'font-size:12px;padding:5px 12px;border-radius:5px;cursor:pointer';
+  btn.textContent = 'View full report →';
+  btn.addEventListener('click', () => {
+    document.querySelector('[data-tab="surveillance"]')?.click();
+  });
+
+  tip.appendChild(nameEl);
+  tip.appendChild(metaEl);
+  tip.appendChild(casesEl);
+  tip.appendChild(descEl);
+  tip.appendChild(btn);
 
   map.appendChild(tip);
   activeTooltip = tip;
@@ -228,7 +253,7 @@ function renderSocialCases(cases) {
     container.innerHTML = `
       <div class="empty-state">
         <div>📭 No cases match your filters</div>
-        <button onclick="clearFilters()">Clear filters</button>
+        <button data-action="clear-filters">Clear filters</button>
       </div>
     `;
     return;
@@ -404,6 +429,7 @@ function initFilterBar() {
   const districtSelect = document.getElementById('caseDistrict');
   const riskSlider = document.getElementById('caseRiskMin');
   const riskValue = document.getElementById('riskMinValue');
+  const clearBtn = document.getElementById('filterClearBtn');
 
   const applyFilters = async () => {
     const filters = {
@@ -415,20 +441,26 @@ function initFilterBar() {
     renderSocialCases(cases);
   };
 
-  searchInput?.addEventListener('input', applyFilters);
-  districtSelect?.addEventListener('change', applyFilters);
-  riskSlider?.addEventListener('input', () => {
-    if (riskValue) riskValue.textContent = riskSlider.value;
-    applyFilters();
-  });
-
-  window.clearFilters = () => {
+  const clearFilters = () => {
     if (searchInput) searchInput.value = '';
     if (districtSelect) districtSelect.value = 'all';
     if (riskSlider) riskSlider.value = '0';
     if (riskValue) riskValue.textContent = '0';
     applyFilters();
   };
+
+  searchInput?.addEventListener('input', applyFilters);
+  districtSelect?.addEventListener('change', applyFilters);
+  riskSlider?.addEventListener('input', () => {
+    if (riskValue) riskValue.textContent = riskSlider.value;
+    applyFilters();
+  });
+  clearBtn?.addEventListener('click', clearFilters);
+
+  // Also wire the empty-state clear button via event delegation
+  document.getElementById('socialCaseList')?.addEventListener('click', e => {
+    if (e.target.matches('[data-action="clear-filters"]')) clearFilters();
+  });
 }
 
 function initExportCsv() {
