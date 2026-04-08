@@ -189,17 +189,19 @@ function renderMapHotspots(hotspots) {
 
 function showHotspotTooltip(hotspot, anchorEl) {
   hideHotspotTooltip();
-  const map = document.getElementById('mapContainer');
-  if (!map) return;
 
   const tip = document.createElement('div');
   tip.className = 'map-tooltip visible';
   tip.id = 'mapTooltip';
   const rect = anchorEl.getBoundingClientRect();
-  const mapRect = map.getBoundingClientRect();
 
-  tip.style.left = (rect.left - mapRect.left + 20) + 'px';
-  tip.style.top = (rect.top - mapRect.top - 10) + 'px';
+  // Use fixed positioning relative to viewport so the tooltip is never clipped
+  // by the map container's overflow:hidden
+  tip.style.position = 'fixed';
+  const tipLeft = Math.min(rect.right + 8, window.innerWidth - 224);
+  const tipTop = Math.max(rect.top - 10, 8);
+  tip.style.left = tipLeft + 'px';
+  tip.style.top = tipTop + 'px';
 
   const nameEl = document.createElement('div');
   nameEl.style.cssText = 'font-weight:600;margin-bottom:4px';
@@ -234,7 +236,7 @@ function showHotspotTooltip(hotspot, anchorEl) {
   tip.appendChild(descEl);
   tip.appendChild(btn);
 
-  map.appendChild(tip);
+  document.body.appendChild(tip);
   activeTooltip = tip;
 }
 
