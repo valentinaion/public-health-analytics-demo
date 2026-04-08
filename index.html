@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Microsoft HealthSync — Public Health Analytics Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles/main.css"/>
+<link rel="stylesheet" href="styles/components.css"/>
+<link rel="stylesheet" href="styles/modals.css"/>
+<link rel="stylesheet" href="styles/responsive.css"/>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <div class="ms-squares">
+        <span class="sq1"></span><span class="sq2"></span>
+        <span class="sq3"></span><span class="sq4"></span>
+      </div>
+      Microsoft
+    </div>
+    <div class="topbar-divider"></div>
+    <span class="platform-name">HealthSync Analytics</span>
+  </div>
+  <div class="topbar-right">
+    <div id="refreshPill" class="refresh-pill" aria-live="polite">
+      <span class="refresh-spin">⟳</span> Refreshing…
+    </div>
+    <div class="topbar-badge">🔒 Gov Cloud · EU Region</div>
+    <div class="live-pill" style="margin:0;border-color:rgba(255,255,255,.3)">
+      <div class="live-dot"></div> Last updated <span id="lastUpdated">just now</span>
+    </div>
+    <div class="user-chip">
+      <div class="avatar">PH</div>
+      <span>Public Health Agency</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="live-pill"><div class="live-dot"></div> Real-time data · Powered by Azure AI</div>
+    <div class="hero-eyebrow">Microsoft HealthSync Analytics · Powered by Azure AI + Microsoft Fabric</div>
+    <h1 class="hero-headline">Transforming Public Health<br>with <span>AI-Driven Intelligence</span></h1>
+    <p class="hero-sub">A unified analytics platform connecting disease surveillance, population health, and social services.</p>
+    <div class="hero-kpis">
+      <div class="kpi-item"><div class="kpi-num" id="kpi1">2.4M</div><div class="kpi-label">Citizens monitored</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi2">7</div><div class="kpi-label">Active alerts</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi3">76<sup>%</sup></div><div class="kpi-label">Earlier outbreak detection</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi4">71<sup>%</sup></div><div class="kpi-label">Reduction in manual triage</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi5">8<sup>x</sup></div><div class="kpi-label">Faster reporting</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Alerts strip ── -->
+<div class="alerts-strip" id="alertsStrip" aria-live="polite" aria-label="Active alerts">
+  <strong style="font-size:12px;color:#7d5200;white-space:nowrap">⚠ Active Alerts: <span class="alerts-badge">4</span></strong>
+  <div class="alert-chip critical"><span class="alert-icon">🔴</span> Respiratory illness surge — Eastern District (+34% WoW)</div>
+  <div class="alert-chip"><span class="alert-icon">🟡</span> Vaccine coverage gap — Rural Zone B (&lt;68%)</div>
+  <div class="alert-chip"><span class="alert-icon">🟡</span> Wastewater SARS-CoV-2 signal elevated — Sector 4</div>
+  <div class="alert-chip"><span class="alert-icon">🔵</span> 3 AI-generated intervention plans ready for review</div>
+</div>
+
+<!-- ── Main content ── -->
+<div class="main-wrap">
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist" aria-label="Analytics sections">
+    <button class="tab-btn active" data-tab="population" role="tab" aria-selected="true" aria-controls="tab-population">
+      <span class="tab-icon">🏥</span> Population Health
+    </button>
+    <button class="tab-btn" data-tab="surveillance" role="tab" aria-selected="false" aria-controls="tab-surveillance">
+      <span class="tab-icon">🔬</span> Disease Surveillance
+    </button>
+    <button class="tab-btn" data-tab="social" role="tab" aria-selected="false" aria-controls="tab-social">
+      <span class="tab-icon">🤝</span> Social Services
+    </button>
+    <button class="tab-btn" data-tab="copilot" role="tab" aria-selected="false" aria-controls="tab-copilot">
+      <span class="tab-icon">✨</span> Copilot for Health
+    </button>
+  </div>
+
+  <!-- ── Tab: Population Health ── -->
+  <div id="tab-population" class="tab-panel active" role="tabpanel" aria-labelledby="tab-population">
+
+    <!-- KPI stat cards -->
+    <div class="grid-4">
+      <div class="card stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-num" style="color:var(--ms-blue)">47.8K</div>
+        <div class="stat-sub">High-Risk Individuals</div>
+        <div class="stat-delta delta-up">↑ 3.2% this month</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-num" style="color:var(--ms-green)">26.4K</div>
+        <div class="stat-sub">Active in Programs</div>
+        <div class="stat-delta delta-up">↑ 5.8% this month</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">💉</div>
+        <div class="stat-num" style="color:var(--ms-teal)">78%</div>
+        <div class="stat-sub">Vaccination Coverage</div>
+        <div class="stat-delta delta-up">↑ 1pt this month</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-num" style="color:var(--ms-purple)">94%</div>
+        <div class="stat-sub">AI Model Confidence</div>
+        <div class="stat-delta delta-up">↑ Stable</div>
+      </div>
+    </div>
+
+    <!-- Trends chart + Risk doughnut -->
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Population Health Trends</span>
+          <span class="card-badge badge-blue">12 months + AI forecast</span>
+        </div>
+        <div class="chart-wrap-lg"><canvas id="chartTrends"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Risk Stratification</span>
+          <span class="card-badge badge-red">2.4M citizens</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chartRisk"></canvas></div>
+        <div style="margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>🔴 Very High</span><span style="font-weight:700">8,200</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>🟠 High</span><span style="font-weight:700">39,623</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>🟡 Moderate</span><span style="font-weight:700">214,000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chronic disease chart -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Chronic Disease Prevalence by District</span>
+          <span class="card-badge badge-amber">Click bar for drill-down</span>
+        </div>
+        <div class="chart-wrap-lg"><canvas id="chartDisease"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">SDOH Program Coverage</span>
+          <span class="card-badge badge-green">6 Programs</span>
+        </div>
+        <div id="sdohBars">
+          <div class="skeleton" style="height:200px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interventions -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">AI-Generated Intervention Plans</span>
+        <span class="card-badge badge-blue">3 plans ready</span>
+      </div>
+      <div class="intervention-grid" id="interventionGrid">
+        <div class="skeleton" style="height:120px"></div>
+        <div class="skeleton" style="height:120px"></div>
+        <div class="skeleton" style="height:120px"></div>
+      </div>
+    </div>
+
+  </div><!-- /tab-population -->
+
+  <!-- ── Tab: Disease Surveillance ── -->
+  <div id="tab-surveillance" class="tab-panel" role="tabpanel" aria-labelledby="tab-surveillance">
+
+    <!-- Summary stats -->
+    <div class="grid-4">
+      <div class="card stat-card">
+        <div class="stat-icon">🦠</div>
+        <div class="stat-num" style="color:var(--ms-red)">847</div>
+        <div class="stat-sub">ILI Cases This Week</div>
+        <div class="stat-delta delta-down">↑ +34% WoW</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">🔬</div>
+        <div class="stat-num" style="color:var(--ms-amber)">5</div>
+        <div class="stat-sub">Active Outbreaks</div>
+        <div class="stat-delta delta-down">↑ 2 new this week</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">💧</div>
+        <div class="stat-num" style="color:var(--ms-teal)">8.1</div>
+        <div class="stat-sub">Wastewater Signal (copies/mL)</div>
+        <div class="stat-delta delta-down">↑ +22% WoW</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-num" style="color:var(--ms-blue)">8d</div>
+        <div class="stat-sub">Avg Early Warning Lead</div>
+        <div class="stat-delta delta-up">↑ Ahead of clinical surge</div>
+      </div>
+    </div>
+
+    <!-- Surveillance chart -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <span class="card-title">Multi-Signal Surveillance Trends (16 weeks)</span>
+        <span class="card-badge badge-red">ILI above threshold</span>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="chartSurveillance"></canvas></div>
+    </div>
+
+    <!-- Outbreaks table + Map -->
+    <div class="grid-1-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Early Warning Log</span>
+          <span class="card-badge badge-amber">4 events</span>
+        </div>
+        <div id="earlyWarningLog">
+          <div class="skeleton" style="height:180px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Geographic Risk Map</span>
+          <span style="font-size:12px;color:var(--text-muted)">Click hotspots for detail</span>
+        </div>
+        <div class="map-placeholder" id="mapContainer">
+          <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+            <path d="M50,80 Q200,20 400,50 Q600,30 750,80 L780,320 Q600,380 400,360 Q200,390 40,340 Z" fill="#0078D4" stroke="#005A9E" stroke-width="2"/>
+            <path d="M150,100 Q300,70 500,90 Q650,80 720,140 L700,280 Q550,310 400,300 Q220,320 130,260 Z" fill="#005A9E" stroke="#003467" stroke-width="1"/>
+            <line x1="400" y1="60" x2="400" y2="370" stroke="#003467" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="60" y1="200" x2="750" y2="200" stroke="#003467" stroke-width="1" stroke-dasharray="4,4"/>
+          </svg>
+          <div class="map-overlay">
+            <div style="font-size:13px;font-weight:600;color:#005A9E;opacity:.7">Regional Disease Map</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">5 Districts · Real-time data</div>
+          </div>
+          <div id="mapHotspots"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outbreaks table -->
+    <div class="card">
+      <div class="section-action-bar">
+        <span class="card-title">Active Outbreak Monitor</span>
+        <button class="export-btn" id="exportOutbreaksBtn">⬇ Export CSV</button>
+      </div>
+      <table class="data-table" aria-label="Active outbreaks">
+        <thead>
+          <tr>
+            <th>Disease</th>
+            <th>District</th>
+            <th>Cases (7d)</th>
+            <th>Trend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="outbreaksTbody">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-surveillance -->
+
+  <!-- ── Tab: Social Services ── -->
+  <div id="tab-social" class="tab-panel" role="tabpanel" aria-labelledby="tab-social">
+
+    <!-- Stats -->
+    <div class="grid-4">
+      <div class="card stat-card">
+        <div class="stat-icon">📁</div>
+        <div class="stat-num" style="color:var(--ms-blue)">812</div>
+        <div class="stat-sub">Open Cases</div>
+        <div class="stat-delta delta-down">↑ 23 this week</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-num" style="color:var(--ms-red)">34</div>
+        <div class="stat-sub">High-Risk (Score 80+)</div>
+        <div class="stat-delta delta-down">↑ 4 escalated</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">👤</div>
+        <div class="stat-num" style="color:var(--ms-amber)">82%</div>
+        <div class="stat-sub">Caseworker Capacity</div>
+        <div class="stat-delta delta-down">↑ Near limit</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-num" style="color:var(--ms-green)">68%</div>
+        <div class="stat-sub">Self-Sufficiency Rate (6mo)</div>
+        <div class="stat-delta delta-up">↑ +5pts vs target</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Case Volume by Program</span>
+          <span class="card-badge badge-blue">6 months</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCaseVolume"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Caseworker Capacity by District</span>
+          <span class="card-badge badge-amber">Eastern at limit</span>
+        </div>
+        <div class="chart-wrap"><canvas id="chartCapacity"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Case list + Workflow -->
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Active High-Risk Cases</span>
+          <span class="card-badge badge-red">6 priority cases</span>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <span class="filter-label">Search:</span>
+          <input type="text" id="caseSearch" placeholder="Search cases…" aria-label="Search cases" style="flex:1;min-width:120px"/>
+          <span class="filter-label">District:</span>
+          <select id="caseDistrict" aria-label="Filter by district">
+            <option value="all">All Districts</option>
+            <option value="eastern">Eastern</option>
+            <option value="northern">Northern</option>
+            <option value="southern">Southern</option>
+            <option value="western">Western</option>
+            <option value="central">Central</option>
+          </select>
+          <span class="filter-label">Min Risk: <span id="riskMinValue">0</span></span>
+          <input type="range" id="caseRiskMin" min="0" max="100" value="0" step="5" aria-label="Minimum risk score filter" style="width:80px"/>
+          <button class="filter-clear-btn" onclick="clearFilters()">Clear</button>
+        </div>
+
+        <div class="case-list" id="socialCaseList">
+          <div class="skeleton" style="height:60px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:60px;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:60px"></div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Workflow steps -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <span class="card-title">Case Workflow</span>
+            <span class="card-badge badge-blue">Click pending step</span>
+          </div>
+          <div id="workflowSteps">
+            <div class="skeleton" style="height:40px;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:40px;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:40px"></div>
+          </div>
+        </div>
+
+        <!-- Program outcomes -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Program Outcomes (Q2 2026)</span>
+          </div>
+          <div class="scorecard-grid">
+            <div class="scorecard" id="outcomeHousing">
+              <div class="scorecard-val" style="color:var(--ms-green)">847</div>
+              <div class="scorecard-lbl">Housing placements</div>
+            </div>
+            <div class="scorecard" id="outcomeBenefits">
+              <div class="scorecard-val" style="color:var(--ms-blue)">2,341</div>
+              <div class="scorecard-lbl">Benefits secured</div>
+            </div>
+            <div class="scorecard" id="outcomeSelf">
+              <div class="scorecard-val" style="color:var(--ms-green)">68%</div>
+              <div class="scorecard-lbl">Self-sufficient at 6mo</div>
+            </div>
+            <div class="scorecard" id="outcomeRepeat">
+              <div class="scorecard-val" style="color:var(--ms-green)">14%</div>
+              <div class="scorecard-lbl">Repeat crisis events</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-social -->
+
+  <!-- ── Tab: Copilot for Health ── -->
+  <div id="tab-copilot" class="tab-panel" role="tabpanel" aria-labelledby="tab-copilot">
+    <div class="grid-2-1" style="align-items:start">
+      <div class="card" style="padding:0">
+        <div class="copilot-wrap">
+          <div class="copilot-header">
+            <div class="copilot-header-title">✨ Copilot for Health Analytics</div>
+            <div class="copilot-header-actions">
+              <button class="copilot-action-btn" id="generateReportBtn" aria-label="Generate executive report">📄 Generate Report</button>
+              <button class="copilot-action-btn" id="clearChatBtn" aria-label="Clear conversation">🗑 Clear</button>
+            </div>
+          </div>
+          <div class="copilot-suggestions" id="copilotSuggestions" aria-label="Suggested questions"></div>
+          <div class="copilot-messages" id="copilotMessages" role="log" aria-live="polite" aria-label="Chat messages"></div>
+          <div class="copilot-input-wrap">
+            <div class="char-counter" id="charCounter" aria-live="polite">0 / 500</div>
+            <div class="copilot-input">
+              <input type="text" id="copilotInput" placeholder="Ask about disease trends, vaccine coverage, social cases…" maxlength="500" aria-label="Message input"/>
+              <button class="send-btn" id="copilotSendBtn" aria-label="Send message">➤</button>
+            </div>
+            <div class="input-hint">Enter to send · Shift+Enter for new line</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Quick stats for Copilot context -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><span class="card-title">Live Data Context</span></div>
+          <div style="font-size:12px;line-height:1.9;color:var(--text-secondary)">
+            <div>🌍 <strong>Monitoring:</strong> 2.4M citizens</div>
+            <div>🦠 <strong>Active outbreaks:</strong> 5</div>
+            <div>🔴 <strong>Alerts:</strong> 7 active</div>
+            <div>👥 <strong>Social cases:</strong> 812 open</div>
+            <div>💉 <strong>Vaccination:</strong> 78% coverage</div>
+            <div>🤖 <strong>AI confidence:</strong> 94%</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><span class="card-title">Suggested Topics</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="padding:8px 12px;background:var(--ms-red-light);border-radius:6px;border-left:3px solid var(--ms-red)">
+              🚨 <strong>Priority:</strong> Eastern District respiratory surge
+            </div>
+            <div style="padding:8px 12px;background:var(--ms-amber-light);border-radius:6px;border-left:3px solid var(--ms-amber)">
+              ⚠️ <strong>Watch:</strong> Sector 4 wastewater signal rising
+            </div>
+            <div style="padding:8px 12px;background:var(--ms-blue-light);border-radius:6px;border-left:3px solid var(--ms-blue)">
+              📋 <strong>Action:</strong> 3 intervention plans awaiting approval
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Capabilities</span></div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.9">
+            <div>📊 Outbreak analysis &amp; forecasting</div>
+            <div>💉 Vaccine coverage gap analysis</div>
+            <div>🏥 Hospital capacity planning</div>
+            <div>👥 Social case prioritisation</div>
+            <div>💰 Cost avoidance estimates</div>
+            <div>📋 Executive report generation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-copilot -->
+
+</div><!-- /main-wrap -->
+
+<!-- ── Footer ── -->
+<div class="demo-footer">
+  <strong>Microsoft HealthSync Analytics</strong> · Powered by Azure AI · Microsoft Fabric · Microsoft 365 Copilot<br>
+  <span style="opacity:.6;font-size:11px;margin-top:4px;display:block">Simulated demo environment · © 2026 Microsoft Corporation</span>
+</div>
+
+<!-- ── Modal/Drawer container ── -->
+<div id="modalContainer"></div>
+
+<!-- ── Toast container ── -->
+<div id="toastContainer" class="toast-container" aria-live="polite" role="status"></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
