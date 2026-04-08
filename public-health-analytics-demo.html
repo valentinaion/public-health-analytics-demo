@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Microsoft HealthSync — Public Health Analytics Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ms-blue: #0078D4;
+    --ms-blue-dark: #005A9E;
+    --ms-blue-light: #C7E0F4;
+    --ms-teal: #00B4D8;
+    --ms-green: #107C10;
+    --ms-green-light: #DFF6DD;
+    --ms-amber: #FF8C00;
+    --ms-amber-light: #FFF4CE;
+    --ms-red: #D13438;
+    --ms-red-light: #FDE7E9;
+    --ms-purple: #5C2D91;
+    --ms-purple-light: #E8D4F5;
+    --bg-primary: #F3F2F1;
+    --bg-card: #FFFFFF;
+    --text-primary: #201F1E;
+    --text-secondary: #605E5C;
+    --text-muted: #A19F9D;
+    --border: #EDEBE9;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+  .topbar { background: var(--ms-blue-dark); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 48px; position: sticky; top: 0; z-index: 100; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-logo { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+  .ms-squares { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
+  .ms-squares span { display: block; border-radius: 1px; }
+  .sq1 { background: #F25022; } .sq2 { background: #7FBA00; } .sq3 { background: #00A4EF; } .sq4 { background: #FFB900; }
+  .topbar-divider { width: 1px; height: 24px; background: rgba(255,255,255,.3); }
+  .platform-name { font-size: 15px; font-weight: 400; opacity: .9; margin-left: 8px; }
+  .topbar-right { display: flex; align-items: center; gap: 20px; }
+  .topbar-badge { background: rgba(255,255,255,.15); border-radius: 12px; padding: 3px 10px; font-size: 12px; }
+  .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--ms-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .hero { background: linear-gradient(135deg, #003467 0%, #005A9E 45%, #0078D4 100%); color: #fff; padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle, rgba(80,230,255,.15) 0%, transparent 70%); }
+  .hero-inner { max-width: 1200px; margin: 0 auto; }
+  .hero-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: .75; margin-bottom: 12px; }
+  .hero-headline { font-size: 34px; font-weight: 700; line-height: 1.2; margin-bottom: 14px; }
+  .hero-headline span { color: #50E6FF; }
+  .hero-sub { font-size: 16px; opacity: .85; max-width: 600px; line-height: 1.6; margin-bottom: 32px; }
+  .hero-kpis { display: flex; gap: 40px; flex-wrap: wrap; }
+  .kpi-item { text-align: center; }
+  .kpi-num { font-size: 36px; font-weight: 800; line-height: 1; color: #50E6FF; }
+  .kpi-num sup { font-size: 18px; vertical-align: super; }
+  .kpi-label { font-size: 12px; opacity: .75; margin-top: 4px; text-transform: uppercase; letter-spacing: .8px; }
+  .live-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 20px; padding: 5px 12px; font-size: 12px; margin-bottom: 24px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #6FCF97; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+  .alerts-strip { background: var(--ms-amber-light); border-bottom: 2px solid var(--ms-amber); padding: 10px 40px; display: flex; align-items: center; gap: 24px; overflow-x: auto; }
+  .alert-chip { display: flex; align-items: center; gap: 7px; background: #fff; border: 1px solid var(--ms-amber); border-radius: 6px; padding: 5px 12px; font-size: 13px; white-space: nowrap; cursor: pointer; transition: box-shadow .15s; }
+  .alert-chip:hover { box-shadow: var(--shadow-sm); }
+  .alert-chip.critical { border-color: var(--ms-red); background: var(--ms-red-light); }
+  .alert-icon { font-size: 14px; }
+  .main-wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+  .tab-btn { padding: 10px 20px; font-size: 14px; font-weight: 500; border: none; background: none; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .15s, border-color .15s; border-radius: var(--radius) var(--radius) 0 0; display: flex; align-items: center; gap: 8px; }
+  .tab-btn:hover { color: var(--ms-blue); background: var(--ms-blue-light); }
+  .tab-btn.active { color: var(--ms-blue); border-bottom-color: var(--ms-blue); font-weight: 600; }
+  .tab-icon { font-size: 16px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 20px; }
+  .card { background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 20px; border: 1px solid var(--border); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; }
+  .card-badge { font-size: 11px; padding: 3px 8px; border-radius: 10px; font-weight: 600; }
+  .badge-green { background: var(--ms-green-light); color: var(--ms-green); }
+  .badge-amber { background: var(--ms-amber-light); color: #7d5200; }
+  .badge-red { background: var(--ms-red-light); color: var(--ms-red); }
+  .badge-blue { background: var(--ms-blue-light); color: var(--ms-blue-dark); }
+  .badge-purple { background: var(--ms-purple-light); color: var(--ms-purple); }
+  .stat-card { display: flex; flex-direction: column; }
+  .stat-num { font-size: 30px; font-weight: 800; line-height: 1.1; color: var(--ms-blue); }
+  .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .stat-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+  .delta-up { color: var(--ms-green); }
+  .delta-down { color: var(--ms-red); }
+  .stat-icon { font-size: 28px; margin-bottom: 8px; }
+  .prog-row { margin-bottom: 14px; }
+  .prog-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+  .prog-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; }
+  .map-placeholder { background: linear-gradient(145deg, #E8F4FD, #C7E0F4); border-radius: var(--radius); height: 280px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .map-placeholder svg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: .18; }
+  .map-hotspot { position: absolute; cursor: pointer; }
+  .map-hotspot .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; animation: ripple 2s infinite; }
+  @keyframes ripple { 0%{box-shadow:0 0 0 0 rgba(209,52,56,.5)} 70%{box-shadow:0 0 0 14px rgba(209,52,56,0)} 100%{box-shadow:0 0 0 0 rgba(209,52,56,0)} }
+  .map-hotspot .dot.amber { animation: ripple-amber 2.3s infinite; }
+  @keyframes ripple-amber { 0%{box-shadow:0 0 0 0 rgba(255,140,0,.5)} 70%{box-shadow:0 0 0 12px rgba(255,140,0,0)} 100%{box-shadow:0 0 0 0 rgba(255,140,0,0)} }
+  .map-overlay { text-align: center; z-index: 2; }
+  .case-list { display: flex; flex-direction: column; gap: 10px; }
+  .case-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; transition: box-shadow .15s; }
+  .case-row:hover { box-shadow: var(--shadow-sm); border-color: var(--ms-blue-light); }
+  .case-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .case-body { flex: 1; }
+  .case-title { font-size: 13px; font-weight: 600; }
+  .case-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .case-right { text-align: right; }
+  .case-score { font-size: 18px; font-weight: 800; }
+  .copilot-wrap { display: flex; flex-direction: column; height: 460px; }
+  .copilot-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { display: flex; gap: 10px; max-width: 90%; }
+  .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+  .msg-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .msg-avatar.ai { background: linear-gradient(135deg, var(--ms-blue), var(--ms-teal)); color: #fff; }
+  .msg-avatar.human { background: var(--ms-purple-light); color: var(--ms-purple); font-weight: 700; }
+  .msg-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; }
+  .msg.ai .msg-bubble { background: var(--bg-primary); border: 1px solid var(--border); border-top-left-radius: 4px; }
+  .msg.user .msg-bubble { background: var(--ms-blue); color: #fff; border-top-right-radius: 4px; }
+  .msg-bubble ul { margin: 6px 0 0 16px; }
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble strong { font-weight: 600; }
+  .copilot-input { display: flex; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--border); align-items: center; }
+  .copilot-input input { flex: 1; border: 1px solid var(--border); border-radius: 20px; padding: 9px 16px; font-size: 13px; outline: none; font-family: inherit; }
+  .copilot-input input:focus { border-color: var(--ms-blue); box-shadow: 0 0 0 2px var(--ms-blue-light); }
+  .send-btn { background: var(--ms-blue); color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: background .15s; }
+  .send-btn:hover { background: var(--ms-blue-dark); }
+  .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 8px 12px; }
+  .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); animation: typing 1.2s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: .2s; }
+  .typing-dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+  .copilot-suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px 0; }
+  .suggestion-chip { background: var(--ms-blue-light); color: var(--ms-blue-dark); border: 1px solid #90c8f5; border-radius: 14px; padding: 5px 12px; font-size: 12px; cursor: pointer; transition: background .15s; }
+  .suggestion-chip:hover { background: #b3d9f5; }
+  .intervention-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .int-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; transition: box-shadow .15s; cursor: pointer; }
+  .int-card:hover { box-shadow: var(--shadow-md); }
+  .int-card.high { border-left: 4px solid var(--ms-red); }
+  .int-card.medium { border-left: 4px solid var(--ms-amber); }
+  .int-card.low { border-left: 4px solid var(--ms-green); }
+  .int-priority { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+  .int-card.high .int-priority { color: var(--ms-red); }
+  .int-card.medium .int-priority { color: var(--ms-amber); }
+  .int-card.low .int-priority { color: var(--ms-green); }
+  .int-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .int-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+  .int-footer { display: flex; align-items: center; justify-content: space-between; }
+  .int-impact { font-size: 12px; font-weight: 700; color: var(--ms-green); }
+  .int-btn { background: var(--ms-blue); color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 11px; cursor: pointer; font-weight: 600; }
+  .int-btn:hover { background: var(--ms-blue-dark); }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-secondary); border-bottom: 2px solid var(--border); }
+  .data-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--bg-primary); }
+  .trend-up::before { content: '↑ '; color: var(--ms-red); font-weight: 700; }
+  .trend-down::before { content: '↓ '; color: var(--ms-green); font-weight: 700; }
+  .trend-flat::before { content: '→ '; color: var(--text-muted); font-weight: 700; }
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 18px; }
+  .tl-dot { position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg-card); }
+  .tl-dot.red { background: var(--ms-red); }
+  .tl-dot.amber { background: var(--ms-amber); }
+  .tl-dot.green { background: var(--ms-green); }
+  .tl-dot.blue { background: var(--ms-blue); }
+  .tl-title { font-size: 13px; font-weight: 600; }
+  .tl-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .tl-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+  .scorecard-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .scorecard { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .scorecard-val { font-size: 22px; font-weight: 800; }
+  .scorecard-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .workflow-step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+  .workflow-step.done { background: var(--ms-green-light); }
+  .workflow-step.active { background: var(--ms-blue-light); border: 1px solid var(--ms-blue); }
+  .workflow-step.pending { background: var(--bg-primary); }
+  .ws-icon { font-size: 18px; width: 32px; text-align: center; }
+  .ws-label { font-size: 13px; font-weight: 600; flex: 1; }
+  .ws-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+  .ws-done { background: var(--ms-green-light); color: var(--ms-green); }
+  .ws-active { background: var(--ms-blue-light); color: var(--ms-blue-dark); }
+  .ws-pending { background: var(--border); color: var(--text-muted); }
+  .demo-footer { background: var(--ms-blue-dark); color: rgba(255,255,255,.7); text-align: center; padding: 20px; font-size: 12px; margin-top: 40px; }
+  .demo-footer strong { color: #fff; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; margin-top: 4px; }
+  .chart-wrap { position: relative; height: 220px; }
+  .chart-wrap-sm { position: relative; height: 160px; }
+  .chart-wrap-lg { position: relative; height: 280px; }
+  @media (max-width: 900px) { .grid-4,.grid-3{grid-template-columns:repeat(2,1fr)} .grid-2-1,.grid-1-2{grid-template-columns:1fr} .hero-kpis{gap:24px} .hero-headline{font-size:26px} .intervention-grid{grid-template-columns:1fr} }
+  @media (max-width: 600px) { .grid-4,.grid-3,.grid-2{grid-template-columns:1fr} .hero{padding:32px 20px} .main-wrap{padding:16px 12px 40px} .tabs{overflow-x:auto} .tab-btn{white-space:nowrap} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <div class="ms-squares"><span class="sq1"></span><span class="sq2"></span><span class="sq3"></span><span class="sq4"></span></div>
+      Microsoft
+    </div>
+    <div class="topbar-divider"></div>
+    <span class="platform-name">HealthSync Analytics</span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-badge">🔒 Gov Cloud · EU Region</div>
+    <div class="live-pill" style="margin:0;border-color:rgba(255,255,255,.3)"><div class="live-dot"></div> Live</div>
+    <div class="user-chip"><div class="avatar">PH</div><span>Public Health Agency</span></div>
+  </div>
+</div>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="live-pill"><div class="live-dot"></div> Real-time data · Last updated 2 min ago</div>
+    <div class="hero-eyebrow">Microsoft HealthSync Analytics · Powered by Azure AI + Microsoft Fabric</div>
+    <h1 class="hero-headline">Transforming Public Health<br>with <span>AI-Driven Intelligence</span></h1>
+    <p class="hero-sub">A unified analytics platform connecting disease surveillance, population health, and social services.</p>
+    <div class="hero-kpis">
+      <div class="kpi-item"><div class="kpi-num" id="kpi1">2.4M</div><div class="kpi-label">Citizens monitored</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi2">7</div><div class="kpi-label">Active alerts</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi3">76<sup>%</sup></div><div class="kpi-label">Earlier outbreak detection</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi4">71<sup>%</sup></div><div class="kpi-label">Reduction in manual triage</div></div>
+      <div class="kpi-item"><div class="kpi-num" id="kpi5">8<sup>x</sup></div><div class="kpi-label">Faster reporting</div></div>
+    </div>
+  </div>
+</div>
+<div class="alerts-strip">
+  <strong style="font-size:12px;color:#7d5200;white-space:nowrap">⚠ Active Alerts:</strong>
+  <div class="alert-chip critical"><span class="alert-icon">🔴</span> Respiratory illness surge — Eastern District (+34% WoW)</div>
+  <div class="alert-chip"><span class="alert-icon">🟡</span> Vaccine coverage gap — Rural Zone B (&lt;68%)</div>
+  <div class="alert-chip"><span class="alert-icon">🟡</span> Wastewater SARS-CoV-2 signal elevated — Sector 4</div>
+  <div class="alert-chip"><span class="alert-icon">🔵</span> 3 AI-generated intervention plans ready for review</div>
+</div>
+<div class="main-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('population',this)"><span class="tab-icon">🏥</span> Population Health</button>
+    <button class="tab-btn" onclick="switchTab('surveillance',this)"><span class="tab-icon">🔬</span> Disease Surveillance</button>
+    <button class="tab-btn" onclick="switchTab('social',this)"><span class="tab-icon">🤝</span> Social Services</button>
+    <button class="tab-btn" onclick="switchTab('copilot',this)"><span class="tab-icon">✨</span> Copilot for Health</button>
+  </div>
+  <div id="tab-population" class="tab-panel active"><p style="padding:40px;text-align:center;color:var(--text-muted)">Population Health content loads here.</p></div>
+  <div id="tab-surveillance" class="tab-panel"><p style="padding:40px;text-align:center;color:var(--text-muted)">Disease Surveillance content loads here.</p></div>
+  <div id="tab-social" class="tab-panel"><p style="padding:40px;text-align:center;color:var(--text-muted)">Social Services content loads here.</p></div>
+  <div id="tab-copilot" class="tab-panel"><p style="padding:40px;text-align:center;color:var(--text-muted)">Copilot for Health content loads here.</p></div>
+</div>
+<div class="demo-footer">
+  <strong>Microsoft HealthSync Analytics</strong> · Powered by Azure AI · Microsoft Fabric · Microsoft 365 Copilot<br>
+  <span style="opacity:.6;font-size:11px;margin-top:4px;display:block">Simulated demo environment · © 2026 Microsoft Corporation</span>
+</div>
+<script>
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
