@@ -5,16 +5,46 @@ import { showToast } from './toasts.js';
 
 const _parser = new DOMParser();
 
-function safeSetHTML(el, trustedHtml) {
-  // Parse the AI-generated HTML in an inert context, then import into the live DOM.
-  // All AI responses originate exclusively from getAIResponse() in src/api/copilot.js
-  // which returns only hard-coded template literals — never user-supplied content.
-  const doc = _parser.parseFromString(`<!DOCTYPE html><body>${trustedHtml}`, 'text/html');
-  const frag = document.createDocumentFragment();
-  while (doc.body.firstChild) {
-    frag.appendChild(document.importNode(doc.body.firstChild, true));
+// Allowed tags in AI response content. Attributes that may appear in responses.
+const ALLOWED_TAGS = new Set(['strong','em','b','i','ul','ol','li','br','p','span','div','table','tr','td','th','thead','tbody']);
+const ALLOWED_ATTRS = new Set(['style','class','colspan','rowspan']);
+
+function importSafeNode(source) {
+  // Text nodes are always safe
+  if (source.nodeType === Node.TEXT_NODE) {
+    return document.createTextNode(source.textContent);
   }
-  el.appendChild(frag);
+  if (source.nodeType !== Node.ELEMENT_NODE) return null;
+
+  const tag = source.tagName.toLowerCase();
+  if (!ALLOWED_TAGS.has(tag)) {
+    // Replace disallowed elements with a span containing their text
+    const fallback = document.createElement('span');
+    fallback.textContent = source.textContent;
+    return fallback;
+  }
+
+  const el = document.createElement(tag);
+  for (const attr of source.attributes) {
+    if (ALLOWED_ATTRS.has(attr.name)) {
+      el.setAttribute(attr.name, attr.value);
+    }
+  }
+  for (const child of source.childNodes) {
+    const safe = importSafeNode(child);
+    if (safe) el.appendChild(safe);
+  }
+  return el;
+}
+
+function safeSetHTML(el, aiHtml) {
+  // Parse AI-generated HTML (from getAIResponse() in copilot.js only) into an inert
+  // document, then walk the tree importing only whitelisted tags and attributes.
+  const doc = _parser.parseFromString(`<!DOCTYPE html><html><body>${aiHtml}`, 'text/html');
+  for (const child of doc.body.childNodes) {
+    const safe = importSafeNode(child);
+    if (safe) el.appendChild(safe);
+  }
 }
 
 const WELCOME_MESSAGE = {
@@ -93,16 +123,26 @@ function createMessageBubble(msg) {
 function createTypingIndicator() {
   const div = document.createElement('div');
   div.className = 'msg ai typing-msg';
-  div.innerHTML = `
-    <div class="msg-avatar ai" aria-hidden="true">✨</div>
-    <div class="msg-bubble">
-      <div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-    </div>
-  `;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ai';
+  avatar.setAttribute('aria-hidden', 'true');
+  avatar.textContent = '✨';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  const indicator = document.createElement('div');
+  indicator.className = 'typing-indicator';
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'typing-dot';
+    indicator.appendChild(dot);
+  }
+
+  bubble.appendChild(indicator);
+  div.appendChild(avatar);
+  div.appendChild(bubble);
   return div;
 }
 
