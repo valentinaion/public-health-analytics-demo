@@ -195,8 +195,24 @@
   .chart-wrap { position: relative; height: 220px; }
   .chart-wrap-sm { position: relative; height: 160px; }
   .chart-wrap-lg { position: relative; height: 280px; }
-  @media (max-width: 900px) { .grid-4,.grid-3{grid-template-columns:repeat(2,1fr)} .grid-2-1,.grid-1-2{grid-template-columns:1fr} .hero-kpis{gap:24px} .hero-headline{font-size:26px} .intervention-grid{grid-template-columns:1fr} }
-  @media (max-width: 600px) { .grid-4,.grid-3,.grid-2{grid-template-columns:1fr} .hero{padding:32px 20px} .main-wrap{padding:16px 12px 40px} .tabs{overflow-x:auto} .tab-btn{white-space:nowrap} }
+  @media (max-width: 900px) { .grid-4,.grid-3{grid-template-columns:repeat(2,1fr)} .grid-2-1,.grid-1-2{grid-template-columns:1fr} .hero-kpis{gap:24px} .hero-headline{font-size:26px} .intervention-grid{grid-template-columns:1fr} .features-grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width: 600px) { .grid-4,.grid-3,.grid-2{grid-template-columns:1fr} .hero{padding:32px 20px} .main-wrap{padding:16px 12px 40px} .tabs{overflow-x:auto} .tab-btn{white-space:nowrap} .features-grid{grid-template-columns:1fr} }
+  .features-section { padding: 36px 0 8px; }
+  .features-header { text-align: center; margin-bottom: 24px; }
+  .features-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+  .features-sub { font-size: 14px; color: var(--text-secondary); max-width: 560px; margin: 0 auto; line-height: 1.6; }
+  .features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .feature-card { background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 24px 20px; border: 1px solid var(--border); border-top: 4px solid var(--feature-accent); }
+  .feature-card--green { --feature-accent: var(--ms-green); }
+  .feature-card--amber { --feature-accent: var(--ms-amber); }
+  .feature-card--teal  { --feature-accent: var(--ms-teal); }
+  .feature-card--blue  { --feature-accent: var(--ms-blue); }
+  .feature-icon { font-size: 28px; margin-bottom: 12px; }
+  .feature-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+  .feature-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+  .feature-list { list-style: none; padding: 0; margin: 0; }
+  .feature-list li { font-size: 12px; color: var(--text-secondary); padding: 3px 0 3px 16px; position: relative; line-height: 1.4; }
+  .feature-list li::before { content: '✓'; position: absolute; left: 0; color: var(--feature-accent); font-weight: 700; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -238,6 +254,63 @@
   <div class="alert-chip"><span class="alert-icon">🔵</span> 3 AI-generated intervention plans ready for review</div>
 </div>
 <div class="main-wrap">
+  <section class="features-section" aria-label="Platform features">
+    <div class="features-header">
+      <h2 class="features-title">Explore the Platform</h2>
+      <p class="features-sub">Four integrated modules delivering real-time intelligence across the public health system</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card feature-card--green">
+        <div class="feature-icon">🏥</div>
+        <div class="feature-title">Population Health</div>
+        <p class="feature-desc">Monitor population-level health outcomes with AI-powered forecasting and intervention workflows.</p>
+        <ul class="feature-list">
+          <li>Animated KPIs with live counters</li>
+          <li>Trends chart with AI forecast</li>
+          <li>Risk stratification doughnut</li>
+          <li>Chronic disease drill-down by district</li>
+          <li>SDOH program coverage bars</li>
+          <li>Intervention approval workflow</li>
+        </ul>
+      </div>
+      <div class="feature-card feature-card--amber">
+        <div class="feature-icon">🔬</div>
+        <div class="feature-title">Disease Surveillance</div>
+        <p class="feature-desc">Detect and track disease outbreaks in real time with multi-signal monitoring and early warnings.</p>
+        <ul class="feature-list">
+          <li>Multi-signal surveillance chart</li>
+          <li>Interactive map with hotspot tooltips</li>
+          <li>Early warning event log</li>
+          <li>Outbreak table with 30-day trajectory</li>
+          <li>CSV export for reporting</li>
+        </ul>
+      </div>
+      <div class="feature-card feature-card--teal">
+        <div class="feature-icon">🤝</div>
+        <div class="feature-title">Social Services</div>
+        <p class="feature-desc">Coordinate social care delivery with intelligent case management and workflow advancement tools.</p>
+        <ul class="feature-list">
+          <li>Live search and filter bar</li>
+          <li>Case detail drawers with history</li>
+          <li>Notes and escalation tools</li>
+          <li>Workflow step advancement</li>
+          <li>Outcome scorecards</li>
+        </ul>
+      </div>
+      <div class="feature-card feature-card--blue">
+        <div class="feature-icon">✨</div>
+        <div class="feature-title">Copilot for Health</div>
+        <p class="feature-desc">Ask questions, get AI insights, and generate executive reports with conversational analytics.</p>
+        <ul class="feature-list">
+          <li>10+ AI response scenarios</li>
+          <li>Persistent conversation history</li>
+          <li>Per-message copy button</li>
+          <li>Contextual suggestion chips</li>
+          <li>Executive report generator</li>
+        </ul>
+      </div>
+    </div>
+  </section>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('population',this)"><span class="tab-icon">🏥</span> Population Health</button>
     <button class="tab-btn" onclick="switchTab('surveillance',this)"><span class="tab-icon">🔬</span> Disease Surveillance</button>

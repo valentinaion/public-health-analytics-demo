@@ -15,6 +15,7 @@
   .filter-bar .filter-clear-btn { margin-left: 0; }
   .modal-box { max-width: 95vw; }
   .drawer { width: 360px; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Mobile ── */
@@ -38,6 +39,7 @@
   .modal-btn { width: 100%; text-align: center; }
   .copilot-header-actions { display: none; }
   .topbar-badge { display: none; }
+  .features-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Minimum supported width ── */
