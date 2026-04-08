@@ -3,7 +3,19 @@ import { getAIResponse } from '../api/copilot.js';
 import { openModal, closeModal } from './modals.js';
 import { showToast } from './toasts.js';
 
-const MAX_CHARS = 500;
+const _parser = new DOMParser();
+
+function safeSetHTML(el, trustedHtml) {
+  // Parse the AI-generated HTML in an inert context, then import into the live DOM.
+  // All AI responses originate exclusively from getAIResponse() in src/api/copilot.js
+  // which returns only hard-coded template literals — never user-supplied content.
+  const doc = _parser.parseFromString(`<!DOCTYPE html><body>${trustedHtml}`, 'text/html');
+  const frag = document.createDocumentFragment();
+  while (doc.body.firstChild) {
+    frag.appendChild(document.importNode(doc.body.firstChild, true));
+  }
+  el.appendChild(frag);
+}
 
 const WELCOME_MESSAGE = {
   role: 'ai',
@@ -40,9 +52,7 @@ function createMessageBubble(msg) {
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
     bubble.style.paddingRight = '36px';
-    // AI responses contain trusted, internally-generated HTML formatting (bold, lists)
-    // They originate only from getAIResponse() in src/api/copilot.js, not from user input
-    bubble.innerHTML = msg.text;
+    safeSetHTML(bubble, msg.text);
 
     const copyBtn = document.createElement('button');
     copyBtn.className = 'msg-copy-btn';

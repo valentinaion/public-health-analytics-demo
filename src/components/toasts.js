@@ -16,18 +16,30 @@ export function showToast(message, type = 'info', duration = 4000) {
   toast.className = `toast toast-${type}`;
   toast.setAttribute('role', 'alert');
   toast.setAttribute('aria-live', 'polite');
-  toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || icons.info}</span>
-    <span class="toast-msg">${message}</span>
-    <button class="toast-close" aria-label="Close notification">×</button>
-  `;
+
+  const iconEl = document.createElement('span');
+  iconEl.className = 'toast-icon';
+  iconEl.textContent = icons[type] || icons.info;
+
+  const msgEl = document.createElement('span');
+  msgEl.className = 'toast-msg';
+  msgEl.textContent = message;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'toast-close';
+  closeBtn.setAttribute('aria-label', 'Close notification');
+  closeBtn.textContent = '×';
+
+  toast.appendChild(iconEl);
+  toast.appendChild(msgEl);
+  toast.appendChild(closeBtn);
 
   const close = () => {
     toast.classList.add('toast-hiding');
     toast.addEventListener('animationend', () => toast.remove(), { once: true });
   };
 
-  toast.querySelector('.toast-close').addEventListener('click', close);
+  closeBtn.addEventListener('click', close);
   container.appendChild(toast);
 
   if (duration > 0) {
